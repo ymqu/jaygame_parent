@@ -54,6 +54,10 @@ public class UserService {
 //        String userId = (String)map.get("userId");
 
         User user = null;
+        String token_expired = (String) request.getAttribute("token_expired");
+        if(token_expired.equals("true")){
+            return user;
+        }
         String token = (String) request.getAttribute("claims_user");
         if(token ==null || "".equals(token)) throw new RuntimeException("please login first");
         else{
@@ -76,5 +80,38 @@ public class UserService {
         return null;
     }
 
+    public boolean register(User user){
+      User user1=  userDao.findByUsername(user.getUsername());
+      if(user1 !=null){
+          return false;
+      }else {
+          User save = userDao.save(user);
+          if(save ==null){
+              return false;
+          }
+      }
+        return true;
+    }
 
+    public boolean update(User user) {
+
+        User user1 = null;
+        String token_expired = (String) request.getAttribute("token_expired");
+        if(token_expired.equals("true")){
+            return false;
+        }
+        String token = (String) request.getAttribute("claims_user");
+        if(token ==null || "".equals(token)) throw new RuntimeException("please login first");
+        else {
+            String claims_user_id = (String) request.getAttribute("claims_user_id");
+            user1 = userDao.getOne(Integer.parseInt(claims_user_id));
+        }
+
+        user1.setUsername(user.getUsername());
+        User save = userDao.save(user1);
+        if(save ==null){
+            return false;
+        }
+        return true;
+    }
 }

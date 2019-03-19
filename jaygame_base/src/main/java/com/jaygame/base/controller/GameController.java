@@ -8,6 +8,7 @@ import entity.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @CrossOrigin
@@ -17,8 +18,17 @@ public class GameController {
     @Autowired
     private GameService gameService;
 
+    @Autowired
+    private HttpServletRequest request;  //get user authorization from client.
+
     @GetMapping(value="/all")
     public Result getAllGame(){
+
+//        String token_expired = (String) request.getAttribute("token_expired");
+//        if(token_expired.equals("true")){
+//            return new Result(false, StatusCode.JWTEXPIRED,"JwtExpired");
+//        }
+
         List<Game> gameInfo = gameService.getGameInfo();
         return new Result(true, StatusCode.OK, "all games", gameInfo);
     }

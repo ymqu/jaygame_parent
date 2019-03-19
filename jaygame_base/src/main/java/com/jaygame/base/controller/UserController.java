@@ -10,6 +10,7 @@ import entity.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +23,9 @@ public class UserController {
     private UserService userService;
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private HttpServletRequest request;  //get user authorization from client.
 
     @RequestMapping(value="/login", method = RequestMethod.POST)
     public Result findUser(@RequestBody User user){
@@ -51,8 +55,43 @@ public class UserController {
     @GetMapping(value="/profile")
     public Result userProfile(){
 
+        String token_expired = (String) request.getAttribute("token_expired");
+        if("true".equals(token_expired)){
+            return new Result(false, StatusCode.JWTEXPIRED,"JwtExpired");
+        }
         User user = userService.userProfile();
         return new Result(true, StatusCode.OK, "username and password correct", user);
+    }
+
+    @PostMapping(value="/reg")
+    public Result userRegister(@RequestBody User user){
+
+        System.out.println("username"+user.getUsername());
+        System.out.println("password"+user.getPassword());
+        user.setUsr_privacy_id(1);
+
+        boolean flag= userService.register(user);
+        if(!flag){
+            return new Result(false, StatusCode.ERROR, "username existed");
+        }
+        return new Result(true, StatusCode.OK, "register success");
+
+    }
+
+    @PostMapping(value="/update")
+    public Result userUpdate(@RequestBody User user){
+
+        String token_expired = (String) request.getAttribute("token_expired");
+        if("true".equals(token_expired)){
+            return new Result(false, StatusCode.JWTEXPIRED,"JwtExpired");
+        }
+
+        boolean flag= userService.update(user);
+        if(!flag){
+            return new Result(false, StatusCode.ERROR, "update failed");
+        }
+        return new Result(true, StatusCode.OK, "register success");
+
     }
 
 }

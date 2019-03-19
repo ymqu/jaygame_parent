@@ -7,4 +7,5 @@ public class StatusCode {
     public static final int ACCESSERROR=20003; //Not enough auth
     public static final int REMOTEERROR=20004;  //remote fail
     public static final int REPERROR=20005; //repeat ops
+    public static final int JWTEXPIRED=20006;
 }
